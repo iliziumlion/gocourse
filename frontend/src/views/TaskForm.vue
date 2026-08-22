@@ -1,3 +1,49 @@
+<script setup>
+import { ref, onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { tasksAPI } from '../api/tasks'
+
+const route = useRoute()
+const router = useRouter()
+
+const form = ref({
+  title: '',
+  description: '',
+  status: 'pending',
+  priority: 'medium'
+})
+
+const isEdit = computed(() => !!route.params.id)
+
+const loadTask = async () => {
+  if (isEdit.value) {
+    try {
+      const response = await tasksAPI.getById(route.params.id)
+      form.value = response.data
+    } catch (error) {
+      console.error('Error loading task:', error)
+    }
+  }
+}
+
+const saveTask = async () => {
+  try {
+    if (isEdit.value) {
+      await tasksAPI.update(route.params.id, form.value)
+    } else {
+      await tasksAPI.create(form.value)
+    }
+    router.push('/tasks')
+  } catch (error) {
+    console.error('Error saving task:', error)
+  }
+}
+
+onMounted(() => {
+  loadTask()
+})
+</script>
+
 <template>
   <div>
     <h2 class="text-3xl font-bold text-gray-800 mb-6">
@@ -69,49 +115,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { tasksAPI } from '../api/tasks'
-
-const route = useRoute()
-const router = useRouter()
-
-const form = ref({
-  title: '',
-  description: '',
-  status: 'pending',
-  priority: 'medium'
-})
-
-const isEdit = computed(() => !!route.params.id)
-
-const loadTask = async () => {
-  if (isEdit.value) {
-    try {
-      const response = await tasksAPI.getById(route.params.id)
-      form.value = response.data
-    } catch (error) {
-      console.error('Error loading task:', error)
-    }
-  }
-}
-
-const saveTask = async () => {
-  try {
-    if (isEdit.value) {
-      await tasksAPI.update(route.params.id, form.value)
-    } else {
-      await tasksAPI.create(form.value)
-    }
-    router.push('/tasks')
-  } catch (error) {
-    console.error('Error saving task:', error)
-  }
-}
-
-onMounted(() => {
-  loadTask()
-})
-</script>

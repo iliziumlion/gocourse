@@ -1,3 +1,24 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import { tasksAPI } from '../api/tasks'
+
+const stats = ref({})
+
+const loadStats = async () => {
+  try {
+    const response = await tasksAPI.getStats()
+    stats.value = response.data
+  } catch (error) {
+    console.error('Error loading stats:', error)
+  }
+}
+
+onMounted(() => {
+  loadStats()
+})
+</script>
+
+
 <template>
   <div>
     <h2 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
@@ -76,23 +97,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, onMounted } from 'vue'
-import { tasksAPI } from '../api/tasks'
-
-const stats = ref({})
-
-const loadStats = async () => {
-  try {
-    const response = await tasksAPI.getStats()
-    stats.value = response.data
-  } catch (error) {
-    console.error('Error loading stats:', error)
-  }
-}
-
-onMounted(() => {
-  loadStats()
-})
-</script>
